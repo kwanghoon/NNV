@@ -22,6 +22,7 @@ g    f1 f2 = f1 * w2_1   + f2 * w2_2   + b2
 f1_1 x1 x2 = sigmoid (g1_1 x1 x2)
 f1_2 x1 x2 = sigmoid (g1_2 x1 x2)
 
+
 f_xor x1 x2 =
-  sigmoid (f1_1 x1 x2 * w2_1 + f1_2 x1 x2 * w2_2 + b2 )
+  sigmoid (g (f1_1 x1 x2) (f1_2 x1 x2) )
     
