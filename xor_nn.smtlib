@@ -74,9 +74,6 @@
           (=> (or  (<  (- x1 x2) (- 0 threshold)) (>  (- x1 x2) threshold)) (> f_xor 0.5 ) )))
 	 )
 
-(assert (= x1 (/ 1.0 8.0)))
-(assert (= x2 (/ 1.0 8.0)))
-
 ;; ;; Solving
 
 ;; $ z3 ./xor_nn.smtlib
