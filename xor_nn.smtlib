@@ -40,38 +40,51 @@
 (assert (= w2_2    6.7997))
 (assert (= b2     -3.0611))
 
+(assert (= threshold 0.1))
+
 ;; The xor neural network
 
 (assert (= g1_1 (+ (+ (* x1 w1_1_1) (* x2 w1_2_1)) b1_1)))
 (assert (= g1_2 (+ (+ (* x1 w1_1_2) (* x2 w1_2_2)) b1_2)))
 (assert (= g    (+ (+ (* f1_1 w2_1) (* f1_2 w2_2)) b2)))
 
-(assert (=> (<= g1_1 -1)                  (and (< 0 f1_1) (<= f1_1 0.26))))
-(assert (=> (and (< -1 g1_1) (<= g1_1 0)) (and (< 0.26 f1_1) (<= f1_1 0.5))))
-(assert (=> (and (< 0 g1_1) (<= g1_1 1))  (and (< 0.5 f1_1) (<= f1_1 0.73))))
+(assert (=> (<= g1_1 (- 1))                  (and (< 0 f1_1)    (<= f1_1 0.26))))
+(assert (=> (and (< (- 1) g1_1) (<= g1_1 0)) (and (< 0.26 f1_1) (<= f1_1 0.5))))
+(assert (=> (and (< 0 g1_1) (<= g1_1 1))  (and (< 0.5 f1_1)  (<= f1_1 0.73))))
 (assert (=> (> g1_1 1)                    (and (< 0.73 f1_1) (< f1_1 1))))
 
-(assert (=> (<= g1_2 -1)                  (and (< 0 f1_2) (<= f1_2 0.26))))
-(assert (=> (and (< -1 g1_2) (<= g1_2 0)) (and (< 0.26 f1_2) (<= f1_2 0.5))))
-(assert (=> (and (< 0 g1_2) (<= g1_2 1))  (and (< 0.5 f1_2) (<= f1_2 0.73))))
+(assert (=> (<= g1_2 (- 1))                  (and (< 0 f1_2)    (<= f1_2 0.26))))
+(assert (=> (and (< (- 1) g1_2) (<= g1_2 0)) (and (< 0.26 f1_2) (<= f1_2 0.5))))
+(assert (=> (and (< 0 g1_2) (<= g1_2 1))  (and (< 0.5 f1_2)  (<= f1_2 0.73))))
 (assert (=> (> g1_2 1)                    (and (< 0.73 f1_2) (< f1_2 1))))
 
-(assert (=> (<= g -1)               (and (< 0 f2) (<= f2 0.26))))
-(assert (=> (and (< -1 g) (<= g 0)) (and (< 0.26 f2) (<= f2 0.5))))
-(assert (=> (and (< 0 g) (<= g 1))  (and (< 0.5 f2) (<= f2 0.73))))
+(assert (=> (<= g (- 1))               (and (< 0 f2)    (<= f2 0.26))))
+(assert (=> (and (< (- 1) g) (<= g 0)) (and (< 0.26 f2) (<= f2 0.5))))
+(assert (=> (and (< 0 g) (<= g 1))  (and (< 0.5 f2)  (<= f2 0.73))))
 (assert (=> (> g 1)                 (and (< 0.73 f2) (< f2 1))))
 
 (assert (= f_xor f2))
 
 ;; ;; A robustness property
 
-(assert (= threshold 0.1))
-
-(assert (not (and (=> (and (<= (- 0 threshold) (- x1 x2)) (<= (- x1 x2) threshold)) (< f_xor 0.5 ) )
-                  (=> (or (< (- x1 x2) (- 0 threshold) ) (>  (- x1 x2) threshold)) (> f_xor 0.5 ) ))))
+(assert
+  (not
+     (or  (=> (and (<= (- 0 threshold) (- x1 x2)) (<= (- x1 x2) threshold)) (<= f_xor 0.5 ) )
+          (=> (or  (<  (- x1 x2) (- 0 threshold)) (>  (- x1 x2) threshold)) (>= f_xor 0.5 ) ))))
 
 
 ;; ;; Solving
 
+;; $ z3 ./xor_nn.smtlib
+;; unsat
+
 (check-sat) 
-(get-model)
+;; (get-model)
+;; (get-value (x1 x2))
+;; (get-value (f_xor))
+;; (get-value (g))
+;; (get-value (f1_1))
+;; (get-value (f1_2))
+;; (get-value (g1_1))
+;; (get-value (g1_2))
+
