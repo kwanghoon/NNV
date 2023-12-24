@@ -48,4 +48,13 @@ propRobustness x1 x2 =
 -- ghci> f_xor 1.0 0.6
 -- 0.454266900491033
 
+-- After increasing the threshold to 0.49
+--
+-- ghci> quickCheck  propRobustness
+-- *** Failed! Falsified (after 2 tests and 5 shrinks):
+-- 0.1
+-- 0.3
+-- False /= True
+-- ghci> f_xor 0.1 0.3
+-- 0.5483615796619974
 
