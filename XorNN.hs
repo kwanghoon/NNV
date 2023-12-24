@@ -1,5 +1,7 @@
 module XorNN where
 
+import Test.QuickCheck
+
 w1_1_1 = 3.4243
 w1_2_1 = 3.4299
 b1_1   = -5.3119
@@ -25,4 +27,25 @@ f1_2 x1 x2 = sigmoid (g1_2 x1 x2)
 
 f_xor x1 x2 =
   sigmoid (g (f1_1 x1 x2) (f1_2 x1 x2) )
-    
+
+threshold :: Double
+threshold = 0.1
+
+propRobustness :: Double -> Double -> Property
+propRobustness x1 x2 =
+  if -threshold <= x1 - x2 && x1 - x2 <= threshold
+    then (f_xor x1 x2 < 0.5) === True
+    else (f_xor x1 x2 > 0.5) === True
+
+-- How to run:
+--   stack ghci XorNN.hs --package QuickCheck
+--
+-- ghci> quickCheck propRobustness
+-- *** Failed! Falsified (after 3 tests and 4 shrinks):
+-- 1.0
+-- 0.6
+-- False /= True
+-- ghci> f_xor 1.0 0.6
+-- 0.454266900491033
+
+
