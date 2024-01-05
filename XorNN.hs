@@ -29,10 +29,21 @@ f_xor x1 x2 =
   sigmoid (g (f1_1 x1 x2) (f1_2 x1 x2) )
 
 threshold :: Double
-threshold = 0.1
+threshold = 0.5
 
 propRobustness :: Double -> Double -> Property
 propRobustness x1 x2 =
+  if 0.5 <= x1 && x1 <= 1.0 &&
+     0.5 <= x2 && x2 <= 1.0 ||
+     0   <= x1 && x1 <  0.5 &&
+     0   <= x2 && x2 <  0.5
+  then (f_xor x1 x2 < 0.5) === True
+  else if x1 < 0 || 1 < x1 || x2 < 0 || 1 < x2
+       then True === True
+       else (f_xor x1 x2 > 0.5) === True
+    
+propRobustness2 :: Double -> Double -> Property
+propRobustness2 x1 x2 =
   if -threshold <= x1 - x2 && x1 - x2 <= threshold
     then (f_xor x1 x2 < 0.5) === True
     else (f_xor x1 x2 > 0.5) === True
@@ -40,7 +51,21 @@ propRobustness x1 x2 =
 -- How to run:
 --   stack ghci XorNN.hs --package QuickCheck
 --
+-- ghci> f_xor 0.0 0.4
+-- 0.5482040334480841
 -- ghci> quickCheck propRobustness
+-- +++ OK, passed 100 tests.
+-- ghci> quickCheck propRobustness
+-- +++ OK, passed 100 tests.
+-- ghci> quickCheck propRobustness
+-- *** Failed! Falsified (after 3 tests and 4 shrinks):
+-- 0.5
+-- 0.5
+-- False /= True
+-- ghci> f_xor 0.5 0.5
+-- 0.9136752529151544
+
+-- ghci> quickCheck propRobustness2
 -- *** Failed! Falsified (after 3 tests and 4 shrinks):
 -- 1.0
 -- 0.6
@@ -50,7 +75,7 @@ propRobustness x1 x2 =
 
 -- After increasing the threshold to 0.49
 --
--- ghci> quickCheck  propRobustness
+-- ghci> quickCheck  propRobustness2
 -- *** Failed! Falsified (after 2 tests and 5 shrinks):
 -- 0.1
 -- 0.3
