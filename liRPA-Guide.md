@@ -48,7 +48,7 @@ If you encounter encoding errors on Windows, modify the `setup.py` file as follo
 Execute the following command:
 
 ```shell
-D:\> python .\examples\simple\toy.py
+D:\auto_LiRPA> python .\examples\simple\toy.py
 ```
 
 #### Expected Output:
@@ -69,7 +69,7 @@ alpha-CROWN linear (symbolic) bounds: lA x + lbias <= f(x) <= uA x + ubias, wher
 Execute the following command:
 
 ```shell
-D:\> python .\examples\vision\simple_verification.py
+D:\auto_LiRPA> python .\examples\vision\simple_verification.py
 ```
 
 #### Expected Output:
