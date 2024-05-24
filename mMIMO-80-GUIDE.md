@@ -1,4 +1,3 @@
-```markdown
 # NNV Environment Setup and Training Guide
 
 ## Prerequisites
@@ -114,7 +113,4 @@ Pruned Accuracy:
 - Loss     :  0.44822415709495544
 - Precision:  0.779856264591217
 ==========================================
-```
-
-You have now successfully set up the environment and run the training script for the NNV project.
 ```
