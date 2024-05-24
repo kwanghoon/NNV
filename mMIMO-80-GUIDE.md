@@ -1,4 +1,4 @@
-# NNV Environment Setup and Training Guide
+# mMIMO-80 Environment Setup and Training Guide
 
 ## Prerequisites
 
