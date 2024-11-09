@@ -24,20 +24,6 @@ wThree1_2 = 1
 fZero1 = (-2,2) 
 fZero2 = (-1,3)
 
---
-lb (a,_) = a
-ub (_,b) = b
-
-lbmul coeff interval = 
-  coeff * (if coeff > 0 
-            then lb interval 
-            else ub interval)
-
-ubmul coeff interval = 
-  coeff * (if coeff > 0 
-            then ub interval 
-            else lb interval)
-
 -- Forward LiRPA 
 sOne1 =
   (wOne1_1 `lbmul` fZero1 + wOne1_2 `lbmul` fZero2,
@@ -55,10 +41,22 @@ fOne2 =
   (alphaLbRelu sOne2 `lbmul` sOne2 + betaLbRelu sOne2,
    alphaUbRelu sOne2 `ubmul` sOne2 + betaUbRelu sOne2)    
 
+-- Linear relaxation for fOne1
+-- alphaLbOne1 * sOne1 + betaLbOne1 <= fOne1 <= alphaUbOne1 * sOne1 + betaUbOne1
+alphaLbOne1 = alphaLbRelu sOne1
+betaLbOne1 = betaLbRelu sOne1
+
 alphaUbOne1 = alphaUbRelu sOne1
+betaUbOne1 = betaUbRelu sOne1
+
+-- Linear relaxation for fOne2
+-- alphaLbOne2 * sOne2 + betaLbOne2 <= fOne2 <= alphaUbOne2 * sOne2 + betaUbOne2
 alphaLbOne2 = alphaLbRelu sOne2
-betaUbOne1  = betaUbRelu sOne1
-betaLbOne2  = betaLbRelu sOne2
+betaLbOne2 = betaLbRelu sOne2
+
+alphaUbOne2 = alphaUbRelu sOne2
+betaUbOne2 = betaUbRelu sOne2
+
 
 sTwo1 = 
   (wTwo1_1 `lbmul` fOne1 + wTwo1_2 `lbmul` fOne2,
@@ -76,10 +74,21 @@ fTwo2 =
   (alphaLbRelu sTwo2 `lbmul` sTwo2 + betaLbRelu sTwo2,
    alphaUbRelu sTwo2 `ubmul` sTwo2 + betaUbRelu sTwo2)   
 
+-- Linear relaxation for fTwo1
+-- alphaLbTwo1 * sTwo1 + betaLbTwo1 <= fTwo1 <= alphaUbTwo1 * sTwo1 + betaUbTwo1 
+alphaLbTwo1 = alphaLbRelu sTwo1
+betaLbTwo1 = betaLbRelu sTwo1 
+
 alphaUbTwo1 = alphaUbRelu sTwo1
+betaUbTwo1 = betaUbRelu sTwo1 
+
+-- Linear relaxation for fTwo2
+-- alphaLbTwo2 * sTwo2 + betaLbTwo2 <= fTwo2 <= alphaUbTwo2 * sTwo2 + betaUbTwo2
 alphaLbTwo2 = alphaLbRelu sTwo2
-betaUbTwo1  = betaUbRelu sTwo1
-betaUbTwo2  = betaUbRelu sTwo2
+betaLbTwo2 = betaLbRelu sTwo2
+
+alphaUbTwo2 = alphaUbRelu sTwo2 
+betaUbTwo2 = betaUbRelu sTwo2 
 
 sThree1 = 
   (wThree1_1 `lbmul` fTwo1 + wThree1_2 `lbmul` fTwo2,
@@ -89,19 +98,125 @@ fThree1 =
   (alphaLbSigmoid sThree1 `lbmul` sThree1 + betaLbSigmoid sThree1,
    alphaUbSigmoid sThree1 `ubmul` sThree1 + betaUbSigmoid sThree1)
 
-alphaUbThree1 = alphaUbSigmoid sThree1
+-- Linear relaxation for fThree1 
+-- alphaLbThree1 * sThree1 + betaLbThree1 <= fThree1 <= alphaUbThree1 * sThree1 + betaUbThree1
 alphaLbThree1 = alphaLbSigmoid sThree1
-betaUbThree1  = betaUbSigmoid sThree1
-betaLbThree1  = betaLbSigmoid sThree1
+betaLbThree1 = betaLbSigmoid sThree1
 
--- Backward LiRPA
+alphaUbThree1 = alphaUbSigmoid sThree1
+betaUbThree1 = betaUbSigmoid sThree1
 
-_alphaUbThree1 = alphaUbThree1
-_alphaLbThree1 = alphaLbThree1
-_betaUbThree1  = betaUbThree1
-_betaLbThree1  = betaLbThree1 
+-- Backward LiRPA (m <=> w, p <=> b)
+
+-- Given alphaLbThree1 * sThree1 + betaLbThree1 <= fThree1 
+--         <= alphaUbThree1 * sThree1 + betaUbThree1
+--       and
+--       sThree1 = wThree1_1 * fTwo1 + wThree1_2 * fTwo2
+-- replace the occurrence of sThree1 with the above expression. 
+-- We get
+--    mLbTwo1 * fTwo1 + mLbTwo2 * fTwo2 + pLbTwo
+--     <= fThree1 <= mUbTwo1 * fTwo1 + mUbTwo2 * fTwo2 + pUbTwo ----- (1)
+
+mLbTwo1 = alphaLbThree1 * wThree1_1
+mLbTwo2 = alphaLbThree1 * wThree1_2 
+pLbTwo = alphaLbThree1 * 0 + betaLbThree1 
+
+mUbTwo1 = alphaUbThree1 * wThree1_1
+mUbTwo2 = alphaUbThree1 * wThree1_2
+pUbTwo = alphaUbThree1 * 0 + betaUbThree1
+
+-- 
+-- Given alphaLbTwo1 * sTwo1 + betaLbTwo1 <= fTwo1 <= alphaUbTwo1 * sTwo1 + betaUbTwo1,
+--       alphaLbTwo2 * sTwo2 + betaLbTwo2 <= fTwo2 <= alphaUbTwo2 * sTwo2 + betaUbTwo2,
+--       sTwo1 = wTwo1_1 * fOne1 + wTwo1_2 * fOne2, and
+--       sTwo2 = wTwo2_1 * fOne1 + wTwo2_2 * fOne2
+-- replace the occurrence of sTwo1 and sTwo2 with the above expressions. Then we get
+--       alphaLbTwo1 * (wTwo1_1 * fOne1 + wTwo1_2 * fOne2) + betaLbTwo1 <= fTwo1 <=
+--       alphaUbTwo1 * (wTwo1_1 * fOne1 + wTwo1_2 * fOne2) + betaUbTwo1
+--       alphaLbTwo2 * (wTwo2_1 * fOne1 + wTwo2_2 * fOne2) + betaLbTwo2 <= fTwo2 <=
+--       alphaUbTwo2 * (wTwo2_1 * fOne1 + wTwo2_2 * fOne2) + betaUbTwo2
+--
+-- We can simplify the above inequalities to
+--       (alphaLbTwo1 * wTwo1_1) * fOne1 + (alphaLbTwo1 * wTwo1_2) * fOne2 + (alphaLbTwo1 * 0) + betaLbTwo1 <= fTwo1 <=
+--       (alphaUbTwo1 * wTwo1_1) * fOne1 + (alphaUbTwo1 * wTwo1_2) * fOne2 + (alphaUbTwo1 * 0) + betaUbTwo1
+--       (alphaLbTwo2 * wTwo2_1) * fOne1 + (alphaLbTwo2 * wTwo2_2) * fOne2 + (alphaLbTwo2 * 0) + betaLbTwo2 <= fTwo2 <=
+--       (alphaUbTwo2 * wTwo2_1) * fOne1 + (alphaUbTwo2 * wTwo2_2) * fOne2 + (alphaUbTwo2 * 0) + betaUbTwo2
+--         ----- (2)
+--
+-- By combining (1) and (2), we want to get 
+--   mLbOne1 * fOne1 + mLbOne2 * fOne2 + pLbOne <= fThree1 <= mUbOne1 * fOne1 + mUbOne2 * fOne2 + pUbOne.  ----- (3)
+--
+-- We can get the following equations
+
+wwTwo1_1 = (alphaLbTwo1 * wTwo1_1, alphaUbTwo1 * wTwo1_1)
+wwTwo1_2 = (alphaLbTwo1 * wTwo1_2, alphaUbTwo1 * wTwo1_2)
+wwTwo2_1 = (alphaLbTwo2 * wTwo2_1, alphaUbTwo2 * wTwo2_1)
+wwTwo2_2 = (alphaLbTwo2 * wTwo2_2, alphaUbTwo2 * wTwo2_2)
+ppTwo1 = (alphaLbTwo1 * 0 + betaLbTwo1, alphaUbTwo1 * 0 + betaUbTwo1)
+ppTwo2 = (alphaLbTwo2 * 0 + betaLbTwo2, alphaUbTwo2 * 0 + betaUbTwo2)
+
+mLbOne1 = mLbTwo1 `lbmul` wwTwo1_1 + mLbTwo2 `lbmul` wwTwo2_1
+mLbOne2 = mLbTwo1 `lbmul` wwTwo1_2 + mLbTwo2 `lbmul` wwTwo2_2
+pLbOne  = mLbTwo1 `lbmul` ppTwo1 + mLbTwo2 `lbmul` ppTwo2 + pLbTwo
+
+mUbOne1 = mUbTwo1 `ubmul` wwTwo1_1 + mUbTwo2 `ubmul` wwTwo2_1
+mUbOne2 = mUbTwo1 `ubmul` wwTwo1_2 + mUbTwo2 `ubmul` wwTwo2_2
+pUbOne  = mUbTwo1 `ubmul` ppTwo1 + mUbTwo2 `ubmul` ppTwo2 + pUbTwo
+
+-- 
+-- Given alphaLbOne1 * sOne1 + betaLbOne1 <= fOne1 <= alphaUbOne1 * sOne1 + betaUbOne1,
+--       alphaLbOne2 * sOne2 + betaLbOne2 <= fOne2 <= alphaUbOne2 * sOne2 + betaUbOne2,
+--       sOne1 = wOne1_1 * fZero1 + wOne1_2 * fZero2, and
+--       sOne2 = wOne2_1 * fZero1 + wOne2_2 * fZero2
+-- replace the occurrence of sOne1 and sOne2 with the above expressions. Then we get
+--       alphaLbOne1 * (wOne1_1 * fZero1 + wOne1_2 * fZero2) + betaLbOne1 <= fOne1 <=
+--       alphaUbOne1 * (wOne1_1 * fZero1 + wOne1_2 * fZero2) + betaUbOne1
+--       alphaLbOne2 * (wOne2_1 * fZero1 + wOne2_2 * fZero2) + betaLbOne2 <= fOne2 <=
+--       alphaUbOne2 * (wOne2_1 * fZero1 + wOne2_2 * fZero2) + betaUbOne2
+--
+-- We can simplify the above inequalities to
+--       (alphaLbOne1 * wOne1_1) * fZero1 + (alphaLbOne1 * wOne1_2) * fZero2 + (alphaLbOne1 * 0) + betaLbOne1 <= fOne1 <=
+--       (alphaUbOne1 * wOne1_1) * fZero1 + (alphaUbOne1 * wOne1_2) * fZero2 + (alphaUbOne1 * 0) + betaUbOne1
+--       (alphaLbOne2 * wOne2_1) * fZero1 + (alphaLbOne2 * wOne2_2) * fZero2 + (alphaLbOne2 * 0) + betaLbOne2 <= fOne2 <=
+--       (alphaUbOne2 * wOne2_1) * fZero1 + (alphaUbOne2 * wOne2_2) * fZero2 + (alphaUbOne2 * 0) + betaUbOne2
+--         ----- (4)
+--
+-- By combining (3) and (4), we want to get
+--   mLbZero1 * fZero1 + mLbZero2 * fZero2 + pLbZero <= fThree1 <= mUbZero1 * fZero1 + mUbZero2 * fZero2 + pUbZero.  ----- (5)
+--
+-- We can get the following equations
+wwOne1_1 = (alphaLbOne1 * wOne1_1, alphaUbOne1 * wOne1_1)
+wwOne1_2 = (alphaLbOne1 * wOne1_2, alphaUbOne1 * wOne1_2)
+wwOne2_1 = (alphaLbOne2 * wOne2_1, alphaUbOne2 * wOne2_1)
+wwOne2_2 = (alphaLbOne2 * wOne2_2, alphaUbOne2 * wOne2_2)
+ppOne1 = (alphaLbOne1 * 0 + betaLbOne1, alphaUbOne1 * 0 + betaUbOne1)
+ppOne2 = (alphaLbOne2 * 0 + betaLbOne2, alphaUbOne2 * 0 + betaUbOne2)
+
+mLbZero1 = mLbOne1 `lbmul` wwOne1_1 + mLbOne2 `lbmul` wwOne2_1
+mLbZero2 = mLbOne1 `lbmul` wwOne1_2 + mLbOne2 `lbmul` wwOne2_2
+pLbZero  = mLbOne1 `lbmul` ppOne1 + mLbOne2 `lbmul` ppOne2 + pLbOne
+
+mUbZero1 = mUbOne1 `ubmul` wwOne1_1 + mUbOne2 `ubmul` wwOne2_1
+mUbZero2 = mUbOne1 `ubmul` wwOne1_2 + mUbOne2 `ubmul` wwOne2_2
+pUbZero  = mUbOne1 `ubmul` ppOne1 + mUbOne2 `ubmul` ppOne2 + pUbOne
+
+lowerBoundBackward = mLbZero1 `lbmul` fZero1 + mLbZero2 `lbmul` fZero2 + pLbZero
+upperBoundBackward = mUbZero1 `ubmul` fZero1 + mUbZero2 `ubmul` fZero2 + pUbZero
 
 
+-- Interval bounds
+lb (a,_) = a
+ub (_,b) = b
+
+lbmul coeff interval = 
+  coeff * (if coeff > 0 
+            then lb interval 
+            else ub interval)
+
+ubmul coeff interval = 
+  coeff * (if coeff > 0 
+            then ub interval 
+            else lb interval)
 
 -- Define the ReLU function
 relu :: Rational -> Rational
