@@ -5,20 +5,55 @@ import Data.Maybe (fromMaybe)
 import Data.Ratio
 
 -- Define weights and bias
-wOne1_1 = 2
-wOne1_2 = 1
+wOne1_1 = 2/3
+wOne1_2 = 1/6
 
-wOne2_1 = -3
-wOne2_2 = 4
+wOne2_1 = -1/3
+wOne2_2 = 1/8
 
-wTwo1_1 = 4
-wTwo1_2 = -2
+wTwo1_1 = 1/2
+wTwo1_2 = -1/5
 
-wTwo2_1 = 2
-wTwo2_2 = 1
+wTwo2_1 = 2/3
+wTwo2_2 = 1/6
 
-wThree1_1 = -2
-wThree1_2 = 1
+wThree1_1 = -1/4
+wThree1_2 = 1/3
+
+-- Backward LiRPA: 
+-- f3: 0.4182519252028747, 0.5783764705106437
+
+-- Forward LiRPA:
+-- f3: 0.3438768659164918, 0.6692646649546782
+-- f21: -0.9583333333333334, 1.075
+-- f22: -1.1319444444444444, 1.3958333333333333
+-- f11: -1.5, 1.8333333333333333
+-- f12: -0.7916666666666666, 1.0416666666666667
+-- f01: -2.0, 2.0
+-- f02: -1.0, 3.0
+
+-- wOne1_1 = 2
+-- wOne1_2 = 1
+
+-- wOne2_1 = -3
+-- wOne2_2 = 4
+
+-- wTwo1_1 = 4
+-- wTwo1_2 = -2
+
+-- wTwo2_1 = 2
+-- wTwo2_2 = 1
+
+-- wThree1_1 = -2
+-- wThree1_2 = 1
+
+-- f3: 4.186393589313198e-51, 0.9999999999999873
+-- f21: 0.0, 48.0
+-- f22: -20.0, 32.0
+-- f11: -5.0, 7.0
+-- f12: -10.0, 18.0
+-- f01: -2.0, 2.0
+-- f02: -1.0, 3.0
 
 -- forward
 fZero1 = (-2,2) 
@@ -262,6 +297,10 @@ tangentLine x x0 = sigmoid x0 + (sigmoidDerivative x0) * (x - x0)
 
 -- Define the binary search to find the x-coordinate 
 -- where the tangent meets sigmoid
+--
+-- e.g.,  binarySearchForTangent (-116) 0 32 0.001
+--        binarySearchForTangent 32 (-116) 0 0.001
+--
 binarySearchForTangent :: Rational -> Rational -> Rational -> 
   Rational -> Rational
 binarySearchForTangent x0 low high epsilon
@@ -327,12 +366,42 @@ betaLbSigmoid interval
 
 main :: IO ()
 main =
-  do let x = binarySearchForTangent (-116) 0 32 0.001
-     putStrLn ("Found tangent touch point at x: " ++ show x)
-      
-     let x = binarySearchForTangent 32 (-116) 0 0.001
-     putStrLn ("Found tangent touch point at x: " ++ show x)
+  do let (baklb, bakub) = (lowerBoundBackward, upperBoundBackward)
+     putStrLn "Backward LiRPA: " 
+     putStrLn ("f3: " ++ show (fromRational baklb :: Double) ++ ", "
+                      ++ show (fromRational bakub :: Double))
+    
+     putStrLn ""
 
+     putStrLn "Forward LiRPA: "
+     
+     let (fwdlb31, fwdub31) = fThree1
+     putStrLn ("f3: " ++ show (fromRational fwdlb31 :: Double) ++ ", "
+                      ++ show (fromRational fwdub31 :: Double))
+
+     let (fwdlb21, fwdub21) = fTwo1
+     putStrLn ("f21: " ++ show (fromRational fwdlb21 :: Double) ++ ", "
+                       ++ show (fromRational fwdub21 :: Double))
+
+     let (fwdlb22, fwdub22) = fTwo2
+     putStrLn ("f22: " ++ show (fromRational fwdlb22 :: Double) ++ ", "
+                       ++ show (fromRational fwdub22 :: Double))
+
+     let (fwdlb11, fwdub11) = fOne1
+     putStrLn ("f11: " ++ show (fromRational fwdlb11 :: Double) ++ ", "
+                       ++ show (fromRational fwdub11 :: Double))
+
+     let (fwdlb12, fwdub12) = fOne2
+     putStrLn ("f12: " ++ show (fromRational fwdlb12 :: Double) ++ ", "
+                       ++ show (fromRational fwdub12 :: Double))
+
+     let (fwdlb01, fwdub01) = fZero1
+     putStrLn ("f01: " ++ show (fromRational fwdlb01 :: Double) ++ ", "
+                       ++ show (fromRational fwdub01 :: Double))
+
+     let (fwdlb02, fwdub02) = fZero2
+     putStrLn ("f02: " ++ show (fromRational fwdlb02 :: Double) ++ ", "
+                       ++ show (fromRational fwdub02 :: Double))
 
 -- -- Main function to find x where tangent touches the sigmoid function at upper bound point
 -- findTangentTouchingPointUpperBound :: Rational -> Maybe Rational
