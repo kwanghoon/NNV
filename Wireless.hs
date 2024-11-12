@@ -23,12 +23,17 @@ wThree1_2 = 1/3
 -- Backward LiRPA: 
 -- f3: 0.4182519252028747, 0.5783764705106437
 
--- Forward LiRPA:
--- f3: 0.3438768659164918, 0.6692646649546782
+-- Forward LiRPA: 
+-- f3: 0.3438768659164918, 0.6692646649546782  
+-- s3: -0.6460648148148148, 0.7048611111111112 
 -- f21: -0.9583333333333334, 1.075
+-- s21: -0.9583333333333334, 1.075
 -- f22: -1.1319444444444444, 1.3958333333333333
+-- s22: -1.1319444444444444, 1.3958333333333333
 -- f11: -1.5, 1.8333333333333333
+-- s11: -1.5, 1.8333333333333333
 -- f12: -0.7916666666666666, 1.0416666666666667
+-- s12: -0.7916666666666666, 1.0416666666666667
 -- f01: -2.0, 2.0
 -- f02: -1.0, 3.0
 
@@ -376,24 +381,40 @@ main =
      putStrLn "Forward LiRPA: "
      
      let (fwdlb31, fwdub31) = fThree1
+     let (fwdlb31_, fwdub31_) = sThree1
      putStrLn ("f3: " ++ show (fromRational fwdlb31 :: Double) ++ ", "
                       ++ show (fromRational fwdub31 :: Double))
 
+     putStrLn ("s3: " ++ show (fromRational fwdlb31_ :: Double) ++ ", "
+                      ++ show (fromRational fwdub31_ :: Double))                      
+
      let (fwdlb21, fwdub21) = fTwo1
+     let (fwdlb21_, fwdub21_) = sTwo1
      putStrLn ("f21: " ++ show (fromRational fwdlb21 :: Double) ++ ", "
                        ++ show (fromRational fwdub21 :: Double))
+     putStrLn ("s21: " ++ show (fromRational fwdlb21_ :: Double) ++ ", "
+                       ++ show (fromRational fwdub21_ :: Double))
 
      let (fwdlb22, fwdub22) = fTwo2
+     let (fwdlb22_, fwdub22_) = sTwo2
      putStrLn ("f22: " ++ show (fromRational fwdlb22 :: Double) ++ ", "
                        ++ show (fromRational fwdub22 :: Double))
+     putStrLn ("s22: " ++ show (fromRational fwdlb22_ :: Double) ++ ", "
+                       ++ show (fromRational fwdub22_ :: Double))
 
      let (fwdlb11, fwdub11) = fOne1
+     let (fwdlb11_, fwdub11_) = sOne1
      putStrLn ("f11: " ++ show (fromRational fwdlb11 :: Double) ++ ", "
                        ++ show (fromRational fwdub11 :: Double))
+     putStrLn ("s11: " ++ show (fromRational fwdlb11_ :: Double) ++ ", "
+                       ++ show (fromRational fwdub11_ :: Double))
 
      let (fwdlb12, fwdub12) = fOne2
+     let (fwdlb12_, fwdub12_) = sOne2
      putStrLn ("f12: " ++ show (fromRational fwdlb12 :: Double) ++ ", "
                        ++ show (fromRational fwdub12 :: Double))
+     putStrLn ("s12: " ++ show (fromRational fwdlb12_ :: Double) ++ ", "
+                       ++ show (fromRational fwdub12_ :: Double))
 
      let (fwdlb01, fwdub01) = fZero1
      putStrLn ("f01: " ++ show (fromRational fwdlb01 :: Double) ++ ", "
