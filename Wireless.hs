@@ -157,13 +157,18 @@ betaUbThree1 = betaUbSigmoid sThree1
 --    mLbTwo1 * fTwo1 + mLbTwo2 * fTwo2 + pLbTwo
 --     <= fThree1 <= mUbTwo1 * fTwo1 + mUbTwo2 * fTwo2 + pUbTwo ----- (1)
 
-mLbTwo1 = alphaLbThree1 * wThree1_1
-mLbTwo2 = alphaLbThree1 * wThree1_2 
-pLbTwo = alphaLbThree1 * 0 + betaLbThree1 
+alphaLbThree1_ = alphaLbThree1 -- 1 -- 
+alphaUbThree1_ = alphaUbThree1 -- 1 --
+betaLbThree1_ = betaLbThree1 -- 0 -- 
+betaUbThree1_ = betaUbThree1 -- 0 -- 
 
-mUbTwo1 = alphaUbThree1 * wThree1_1
-mUbTwo2 = alphaUbThree1 * wThree1_2
-pUbTwo = alphaUbThree1 * 0 + betaUbThree1
+mLbTwo1 = alphaLbThree1_ * wThree1_1
+mLbTwo2 = alphaLbThree1_ * wThree1_2 
+pLbTwo = alphaLbThree1_ * 0 + betaLbThree1_ 
+
+mUbTwo1 = alphaUbThree1_ * wThree1_1
+mUbTwo2 = alphaUbThree1_ * wThree1_2
+pUbTwo = alphaUbThree1_ * 0 + betaUbThree1_
 
 -- 
 -- Given alphaLbTwo1 * sTwo1 + betaLbTwo1 <= fTwo1 <= alphaUbTwo1 * sTwo1 + betaUbTwo1,
